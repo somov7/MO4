@@ -1,15 +1,16 @@
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
 
-let l = -Math.PI / 2;
-let r = Math.PI / 2;
+let l = 0;
+let r = 3;
 let dataX = [], dataY = [];
 let regrA = 0, regrB = 0;
-let points = 100;
-let noiseValue = 10;
+let points = 500;
+let noiseValue = 3;
+let err = 0;
 
 function func(x){
-    return Math.sin(x) + 2;
+    return Math.pow(1.1, x) - 2;
 }
 
 let minx, maxx, miny, maxy;
@@ -20,7 +21,7 @@ function mapSegment(x, oldL, oldR, newL, newR){
 
 function generate(n){
     dataX = generateX(n);
-    dataY = generateY(dataX);
+    dataY = generateY();
 }
 
 function generateX(n){
@@ -39,9 +40,9 @@ function noise(width){
     return (v / 1000 - 0.5) * width;
 }   
 
-function generateY(dataX){
-    dataY = [];
+function generateY(){
     n = dataX.length;
+    dataY = [];
     for(let i = 0; i < n; i++){
         let y = func(dataX[i]) + noise(noiseValue);
         dataY.push(y);
@@ -57,19 +58,29 @@ function average(data){
     return avg / data.length;
 }
 
-function regression(dataX, dataY){
+function regression(){
     let a = 0, b = 0;
-    if(dataX == undefined)
+    if(dataX.length == 0)
         return;
+    let k = parseInt(Math.round(dataX.length * 0.8));
     let avgX = average(dataX);
     let avgY = average(dataY);
     n = dataX.length;
-    for(let i = 0; i < n; i++){
-        a += (dataX[i] - avgX) * (dataY[i] - avgY);
-        b += (dataX[i] - avgX) * (dataX[i] - avgX);
+    for(let i = 0; i < k; i++){
+        let x = (dataX[i] - avgX);
+        let y = (dataY[i] - avgY); 
+        a += x * y;
+        b += x * x;
     }
     regrA = a / b;
     regrB = avgY - regrA * avgX;
+    err = 0;
+    for(let i = k; i < n; i++){
+        let y = dataY[i] - (regrA * dataX[i] + regrB);
+        err += y * y;
+    }
+    err = Math.sqrt(err / (n - k))
+    updateOutput();
 }
 
 function draw(dataX, dataY){  
@@ -79,21 +90,32 @@ function draw(dataX, dataY){
     maxy = Math.max.apply(null, dataY);
     if($('#drawFunction').is(':checked'))
         drawFunc();
-    if($('#drawData').is(':checked'))
-        drawData(dataX, dataY);
+    drawData(dataX, dataY);
     if($('#drawRegression').is(':checked'))
         drawRegr();
 }
 
 function drawData(dataX, dataY){
-    for(let i = 0; i < dataX.length; i++){
-        let x = mapSegment(dataX[i], l, r, 25, 625);
-        let y = mapSegment(dataY[i], func(l), func(r), 700, 100);
-        ctx.fillStyle = "rgba(255, 50, 50, 0.5)";
-        ctx.beginPath();
-        ctx.arc(x, y, 2.5, 0, 2 * Math.PI);
-        ctx.fill();
-    }
+    let k = parseInt(Math.round(dataX.length * 0.8));
+    if($('#drawData').is(':checked'))
+        for(let i = 0; i < k; i++){
+            let x = mapSegment(dataX[i], l, r, 25, 625);
+            let y = mapSegment(dataY[i], func(l), func(r), 700, 100);
+            ctx.fillStyle = "rgba(255, 50, 50, 0.5)";
+            ctx.beginPath();
+            ctx.arc(x, y, 2.5, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+    if($('#drawTestData').is(':checked'))
+        for(let i = k; i < dataX.length; i++){
+            let x = mapSegment(dataX[i], l, r, 25, 625);
+            let y = mapSegment(dataY[i], func(l), func(r), 700, 100);
+            ctx.fillStyle = "rgba(220, 0, 255, 0.5)";
+            ctx.beginPath();
+            ctx.arc(x, y, 2.5, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+    
 }
 
 function drawFunc(){

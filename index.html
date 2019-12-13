@@ -15,14 +15,17 @@
         <canvas id="canvas" width="650px" height="800px"></canvas>
     </div>
     <div id="controls">
-        <span id="pointsText">Количество точек: 100</span></br>
-        <input type="range" id="pointsNumber" min="5" max="5000" value="100"></br>
-        <span id="noiseText">Уровень шума: 10</span></br>
-        <input type="range" id="noiseValue" min="0" max="100" step="0.01" value="10"></br>
+        <span id="pointsText">Количество точек: </span></br>
+        <input type="number" id="pointsNumber" min="5" max="5000" value="500" autocomplete="off"></br>
+        <span id="noiseText">Уровень шума: </span></br>
+        <input type="number" id="noiseValue" min="0" max="100" step="0.01" value="3" autocomplete="off"></br>
         <input type="button" id="generate" value="Сгенерировать данные"></br>
         <input type="checkbox" id="drawFunction" checked>Отображать функцию</input></br>
-        <input type="checkbox" id="drawData" checked>Отображать данные</input></br>
-        <input type="checkbox" id="drawRegression" checked>Отображать регрессию</input>
+        <input type="checkbox" id="drawData" checked>Отображать тренировачные данные</input></br>
+        <input type="checkbox" id="drawTestData" checked>Отображать тестовые данные</input></br>
+        <input type="checkbox" id="drawRegression" checked>Отображать регрессию</input></br>
+        <span id="regressionFormula"></span></br>
+        <span id="err"></span></br>
     </div>
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
