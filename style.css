@@ -1,0 +1,19 @@
+#canvas{
+    border: 1px solid black;
+}
+
+#mainDiv { 
+    width: 1200px;
+    margin: 0 auto;
+}
+
+#canvasDiv{
+    width: 650px;
+    float: left;
+}
+
+#controls{
+    margin-left: 670px;
+    position: absolute;
+    width: 550px;
+}
