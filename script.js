@@ -50,6 +50,7 @@ function generateY(){
     return dataY;
 }
 
+/*
 function average(data){
     let avg = 0;
     for(let i = 0; i < data.length; i++){
@@ -57,27 +58,28 @@ function average(data){
     }
     return avg / data.length;
 }
+*/
 
 function regression(){
-    let a = 0, b = 0;
+    let xx = 0, xy = 0, x = 0, y = 0;
     if(dataX.length == 0)
-        return;
+        return; 
     let k = parseInt(Math.round(dataX.length * 0.8));
-    let avgX = average(dataX);
-    let avgY = average(dataY);
+    //let avgX = average(dataX);
+    //let avgY = average(dataY);
     n = dataX.length;
     for(let i = 0; i < k; i++){
-        let x = (dataX[i] - avgX);
-        let y = (dataY[i] - avgY); 
-        a += x * y;
-        b += x * x;
+        xx += dataX[i] * dataX[i];
+        x += dataX[i];
+        xy += dataX[i] * dataY[i];
+        y += dataY[i];
     }
-    regrA = a / b;
-    regrB = avgY - regrA * avgX;
+    regrA = (k * xy - x * y) / (k * xx - x * x);
+    regrB = (y - regrA * x) / k;
     err = 0;
     for(let i = k; i < n; i++){
-        let y = dataY[i] - (regrA * dataX[i] + regrB);
-        err += y * y;
+        let e = dataY[i] - (regrA * dataX[i] + regrB);
+        err += e * e;
     }
     err = Math.sqrt(err / (n - k))
     updateOutput();
@@ -88,6 +90,8 @@ function draw(dataX, dataY){
     maxx = Math.max.apply(null, dataX);
     miny = Math.min.apply(null, dataY);
     maxy = Math.max.apply(null, dataY);
+    if($('#drawGrid').is(':checked'))
+        drawGrid();
     if($('#drawFunction').is(':checked'))
         drawFunc();
     drawData(dataX, dataY);
@@ -128,6 +132,29 @@ function drawFunc(){
     }700
     ctx.stroke();
     ctx.lineWidth = 1;
+}
+
+function drawGrid(){
+    ctx.font = "14px Arial";
+    ctx.lineWidth = 0.5;
+    ctx.strokeStyle = "rgba(100, 100, 100, 1)";
+    ctx.fillStyle = "black";
+    for(let i = -5; i <= 5; i++){
+        let x = mapSegment(i, l, r, 25, 625);
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, 800);
+        ctx.stroke();
+        ctx.fillText(i, x + 1, 12);
+    }
+    for(let i = -10; i <= 10; i += 0.1){
+        let y = mapSegment(i, func(l), func(r), 700, 100);
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(650, y);
+        ctx.stroke();
+        ctx.fillText(Math.round(i * 10) / 10, 1, y - 2)
+    }
 }
 
 function drawRegr(){
